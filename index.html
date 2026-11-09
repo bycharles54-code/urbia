@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Urbia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#ff722c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,300;0,500;0,700;0,800;0,900;1,300;1,800;1,900&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+  /* Layout: una sola página móvil, crema con brillos naranja; las bandas naranja y humo cortan el scroll como cinta.
+     La marca se compromete a un solo look (crema, naranja, humo), así que no cambia con el tema del visor. */
+  :root {
+    --crema: #f2f0ea; --naranja: #ff722c; --humo: #232323; --blanco: #ffffff; --glow: #ffa36f; --azul: #2f6fd6;
+    --linea: rgba(35,35,35,.14);
+    --display: "Archivo", "Arial Black", "Helvetica Neue", sans-serif;
+    --texto: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --mano: "Gochi Hand", "Comic Sans MS", cursive;
+    color-scheme: light;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 4.2rem); -webkit-text-size-adjust: 100%; overflow-x: clip; }
+  body { margin: 0; background: var(--crema); color: var(--humo); font-family: var(--texto); font-size: 1rem; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: clip; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 50; background: var(--crema); }
+  img { display: block; max-width: 100%; }
+  button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 3px solid var(--naranja); outline-offset: 3px; }
+  .gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .ancho { max-width: 1120px; margin: 0 auto; }
+  .eti { font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+
+  /* titulares como en el brandbook: liviano + extra grueso */
+  .tit { margin: 0; font-family: var(--display); font-weight: 300; font-size: clamp(2.1rem, 8.6vw, 4.4rem); line-height: .98; letter-spacing: -.02em; color: var(--naranja); text-wrap: balance; }
+  .tit b { font-weight: 800; }
+  .sub { margin: .9rem 0 0; max-width: 34ch; font-size: 1.02rem; }
+  .sub b { font-weight: 700; }
+
+  /* pastillas y botones (las pastillas de "Creatividad / Innovación" del brandbook) */
+  .pill { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: .78rem 1.35rem; border-radius: 999px; border: 2px solid var(--naranja);
+    background: var(--naranja); color: var(--blanco); font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.05rem; text-decoration: none; white-space: nowrap;
+    transition: transform .15s ease, background-color .2s ease, color .2s ease; }
+  .pill:active { transform: scale(.96); }
+  .pill.blanca { background: var(--blanco); color: var(--naranja); }
+  .pill.humo { background: var(--humo); border-color: var(--humo); color: var(--blanco); }
+  .pill.chica { padding: .45rem .9rem; font-size: .92rem; }
+
+  /* barra */
+  .barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; background: color-mix(in srgb, var(--crema) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+  .barra .fila { display: flex; align-items: center; gap: .8rem; height: 3.6rem; }
+  .barra .logo { height: 1.55rem; width: auto; }
+  .barra nav { display: none; gap: .3rem; margin-left: auto; }
+  .barra nav a { padding: .4rem .75rem; border-radius: 999px; color: var(--humo); text-decoration: none; font-weight: 700; font-size: .95rem; }
+  .barra nav a:hover { background: var(--blanco); color: var(--naranja); }
+  .bolsa-btn { margin-left: auto; display: inline-flex; align-items: center; gap: .4rem; padding: .45rem .85rem; border-radius: 999px; border: 2px solid var(--humo); background: var(--humo); color: var(--blanco); font-weight: 800; font-style: italic; }
+  .bolsa-btn .n { display: inline-grid; place-items: center; min-width: 1.35rem; height: 1.35rem; padding: 0 .3rem; border-radius: 999px; background: var(--naranja); font-style: normal; font-size: .8rem; }
+  .bolsa-btn.salta { animation: salta .5s cubic-bezier(.3,1.8,.5,1); }
+  @keyframes salta { 40% { transform: scale(1.18) rotate(-4deg); } }
+
+  /* brillo naranja difuso (el fondo de todas las láminas) */
+  .brillo { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .brillo i { position: absolute; width: var(--s); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, var(--glow) 0%, rgba(255,114,44,.55) 28%, rgba(255,114,44,0) 68%);
+    left: var(--x); top: var(--y); transform: translate(-50%, -50%); animation: deriva var(--t, 14s) ease-in-out infinite alternate; filter: blur(8px); }
+  @keyframes deriva { to { transform: translate(calc(-50% + var(--dx, 30px)), calc(-50% + var(--dy, -40px))) scale(1.12); } }
+
+  /* portada */
+  .portada { position: relative; overflow: hidden; padding-block: 1.2rem 0; }
+  .portada .dentro { position: relative; z-index: 2; display: grid; gap: 1rem; }
+  .portada .hola { display: flex; justify-content: space-between; align-items: center; }
+  .portada .logo-xl { width: min(92%, 640px); height: auto; margin-top: .4rem; animation: entra .9s cubic-bezier(.2,1.3,.4,1) both; }
+  @keyframes entra { from { opacity: 0; transform: translateY(24px) skewX(-8deg); } }
+  .portada .acciones { display: flex; flex-wrap: wrap; gap: .6rem; }
+  .escenario { position: relative; height: clamp(340px, 92vw, 560px); margin-top: .6rem; }
+  .escenario .modelo { position: absolute; right: -6%; bottom: 0; width: min(118%, 680px); max-width: none; height: auto; pointer-events: none; }
+  .sticker { position: absolute; z-index: 3; touch-action: none; user-select: none; -webkit-user-select: none; cursor: grab; filter: drop-shadow(0 6px 10px rgba(35,35,35,.18));
+    transform: translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--r, 0deg)); transition: filter .2s ease; }
+  .sticker:active { cursor: grabbing; filter: drop-shadow(0 12px 18px rgba(35,35,35,.3)); }
+  .sticker img { width: 100%; height: auto; pointer-events: none; }
+  .pista { position: absolute; left: 0; bottom: .8rem; z-index: 4; background: var(--blanco); color: var(--humo); border-radius: 999px; padding: .3rem .75rem; font-size: .78rem; font-weight: 700; }
+
+  /* cinta */
+  .cinta-caja { position: relative; z-index: 3; overflow: hidden; padding-block: 1.2rem; margin-top: -1.6rem; }
+  .cinta { position: relative; z-index: 3; background: var(--naranja); color: var(--blanco); overflow: hidden; white-space: nowrap; padding-block: .7rem; transform: rotate(-2deg); margin: 0 -4%; }
+  .cinta div { display: inline-block; font-family: var(--display); font-weight: 900; font-style: italic; font-size: clamp(1.4rem, 6vw, 2.2rem); animation: corre 26s linear infinite; }
+  .cinta span { display: inline-block; margin: 0 .55em; }
+  .cinta svg { display: inline-block; width: .8em; height: .8em; vertical-align: -.05em; margin: 0 .45em; fill: var(--blanco); }
+  @keyframes corre { to { transform: translateX(-50%); } }
+
+  section.sec { position: relative; overflow-x: clip; padding-block: clamp(3.2rem, 10vw, 5.5rem); }
+  .cabeza { position: relative; z-index: 2; display: grid; gap: .2rem; margin-bottom: 1.6rem; }
+
+  /* catálogo */
+  .chips { display: flex; gap: .45rem; overflow-x: auto; scrollbar-width: none; padding-bottom: .4rem; margin-bottom: 1.2rem; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chips button { flex: none; padding: .5rem 1rem; border-radius: 999px; border: 2px solid var(--naranja); background: var(--blanco); color: var(--naranja); font-weight: 800; font-style: italic; }
+  .chips button[aria-pressed="true"] { background: var(--naranja); color: var(--blanco); }
+  .grilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem .9rem; }
+  .prod { display: grid; gap: .6rem; padding: 0; border: 0; background: none; text-align: left; }
+  .prod .vitrina { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 5; border-radius: 22px; background: var(--blanco); overflow: hidden; }
+  .prod .vitrina::before { content: ""; position: absolute; width: 90%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255,114,44,.38), rgba(255,114,44,0) 66%); }
+  .prod .funda { width: 46%; transform: rotate(-8deg); transition: transform .35s cubic-bezier(.3,1.5,.5,1); }
+  .prod:hover .funda, .prod:focus-visible .funda { transform: rotate(0deg) translateY(-6px) scale(1.04); }
+  .prod .info { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
+  .prod .info > div { min-width: 0; }
+  .prod h3 { margin: 0; font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.08rem; line-height: 1.1; }
+  .prod .cat { font-size: .82rem; opacity: .7; }
+  .prod .precio { font-weight: 700; font-size: .88rem; color: var(--naranja); }
+  .prod .mas { flex: none; display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: var(--naranja); color: var(--blanco); font-size: 1.4rem; font-weight: 700; line-height: 1; }
+  .prod .badge { position: absolute; top: .7rem; left: .7rem; z-index: 2; padding: .2rem .6rem; border-radius: 999px; background: var(--humo); color: var(--blanco); font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+  /* la funda dibujada */
+  .funda { position: relative; aspect-ratio: 9 / 18.6; border-radius: 17% / 8.5%; border: 3px solid var(--humo); background: var(--pat, var(--crema)); overflow: hidden; box-shadow: inset -8px 0 14px -10px rgba(0,0,0,.35), 6px 10px 22px rgba(35,35,35,.18); }
+  .funda .cam { position: absolute; left: 8%; top: 4%; width: 40%; aspect-ratio: 1; border-radius: 26%; background: rgba(35,35,35,.92);
+    background-image: radial-gradient(circle at 30% 30%, #4a4a4a 0 14%, #111 15% 21%, transparent 22%), radial-gradient(circle at 30% 72%, #4a4a4a 0 14%, #111 15% 21%, transparent 22%), radial-gradient(circle at 72% 50%, #4a4a4a 0 14%, #111 15% 21%, transparent 22%); }
+  .funda .marca { position: absolute; left: 50%; bottom: 7%; width: 18%; transform: translateX(-50%); opacity: .85; }
+  .funda .frase { position: absolute; inset: 30% 10% auto; font-family: var(--mano); color: #2a3c8f; text-align: center; font-size: var(--fs, 1rem); line-height: 1.15; text-transform: uppercase; }
+  .funda .stk { position: absolute; left: 50%; top: 55%; width: 70%; transform: translate(calc(-50% + var(--sx, 0px)), calc(-50% + var(--sy, 0px))) rotate(-8deg); touch-action: none; }
+  .funda .txt { position: absolute; left: 0; right: 0; top: 28%; text-align: center; font-family: var(--display); font-weight: 900; font-style: italic; font-size: var(--fs, 1.4rem); line-height: 1; color: var(--tc, var(--blanco)); text-shadow: 2px 2px 0 var(--ts, var(--humo)); overflow-wrap: anywhere; padding: 0 8%; }
+
+  /* hoja inferior (detalle y pedido) */
+  .velo { position: fixed; inset: 0; z-index: 60; background: rgba(35,35,35,.5); opacity: 0; transition: opacity .25s ease; }
+  .velo.ver { opacity: 1; }
+  .hoja { position: fixed; left: 0; right: 0; bottom: 0; z-index: 61; max-height: 92vh; overflow-y: auto; background: var(--crema); border-radius: 26px 26px 0 0;
+    padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); padding-block: .6rem calc(1.4rem + env(safe-area-inset-bottom, 0px));
+    transform: translateY(105%); transition: transform .35s cubic-bezier(.2,.9,.25,1); }
+  .hoja.ver { transform: none; }
+  .hoja .agarre { width: 3rem; height: 5px; border-radius: 5px; background: var(--linea); margin: 0 auto .8rem; }
+  .hoja .cerrar { z-index: 3; box-shadow: 0 2px 8px rgba(35,35,35,.15); position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); top: .8rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 0; background: var(--blanco); font-size: 1.1rem; font-weight: 700; }
+  .det { display: grid; gap: 1rem; max-width: 760px; margin: 0 auto; }
+  .det .vista { position: relative; display: grid; place-items: center; padding-block: 1.4rem; border-radius: 22px; background: var(--blanco); overflow: hidden; }
+  .det .vista .funda { width: min(38%, 170px); transform: rotate(-6deg); }
+  .det h3 { margin: 0; font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.7rem; line-height: 1; color: var(--naranja); }
+  .det p { margin: 0; }
+  .ctl { display: block; margin-bottom: .45rem; font-weight: 800; font-size: .92rem; }
+  .modelos { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .modelos button, .opc button { padding: .42rem .8rem; border-radius: 999px; border: 2px solid var(--linea); background: var(--blanco); font-size: .88rem; font-weight: 600; }
+  .modelos button[aria-pressed="true"], .opc button[aria-pressed="true"] { border-color: var(--naranja); background: var(--naranja); color: var(--blanco); }
+  .cant { display: inline-flex; align-items: center; gap: .8rem; padding: .25rem; border-radius: 999px; background: var(--blanco); }
+  .cant button { width: 2.2rem; height: 2.2rem; border-radius: 50%; border: 0; background: var(--crema); font-size: 1.2rem; font-weight: 700; }
+  .cant span { min-width: 1.5rem; text-align: center; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .pie-hoja { display: flex; align-items: center; justify-content: space-between; gap: .8rem; flex-wrap: wrap; }
+
+  .pedido-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+  .pedido-lista li { display: grid; grid-template-columns: 2.6rem 1fr auto; gap: .8rem; align-items: center; padding: .7rem; border-radius: 18px; background: var(--blanco); }
+  .pedido-lista .funda { width: 2.6rem; border-width: 2px; box-shadow: none; }
+  .pedido-lista b { display: block; font-style: italic; }
+  .pedido-lista small { display: block; opacity: .7; }
+  .pedido-lista .quitar { border: 0; background: var(--crema); width: 2rem; height: 2rem; border-radius: 50%; font-weight: 700; }
+  .vacio { padding: 1.4rem; border-radius: 18px; background: var(--blanco); text-align: center; }
+  .resumen { white-space: pre-wrap; font-size: .85rem; padding: .8rem; border-radius: 14px; background: var(--blanco); max-height: 9rem; overflow: auto; }
+
+  /* crea la tuya */
+  .crea { background: var(--naranja); color: var(--blanco); overflow: hidden; }
+  .crea .tit { color: var(--blanco); }
+  .crea .sub { color: var(--blanco); }
+  .crea .lab { display: grid; grid-template-columns: 1fr; gap: 1.4rem; position: relative; z-index: 2; }
+  .crea .lab > * { min-width: 0; }
+  .crea .vista { position: relative; display: grid; place-items: center; padding-block: 1.8rem; border-radius: 28px; background: var(--crema); overflow: hidden; }
+  .crea .vista .funda { width: min(46%, 220px); }
+  .crea .vista .nota { position: absolute; bottom: .7rem; left: 0; right: 0; text-align: center; font-size: .78rem; font-weight: 700; color: var(--humo); opacity: .7; }
+  .mandos { display: grid; gap: 1.1rem; }
+  .mandos .ctl { color: var(--blanco); }
+  .colores { display: flex; gap: .55rem; flex-wrap: wrap; }
+  .colores button { width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 3px solid var(--blanco); background: var(--c); padding: 0; }
+  .colores button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--naranja), 0 0 0 6px var(--blanco); }
+  .opc { display: flex; gap: .4rem; flex-wrap: wrap; }
+  .opc button { border-color: rgba(255,255,255,.6); background: transparent; color: var(--blanco); }
+  .opc button[aria-pressed="true"] { border-color: var(--blanco); background: var(--blanco); color: var(--naranja); }
+  .stks { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .4rem; }
+  .stks button { aspect-ratio: 1; display: grid; place-items: center; padding: .25rem; border-radius: 14px; border: 2px solid rgba(255,255,255,.5); background: rgba(255,255,255,.14); color: var(--blanco); font-weight: 800; font-size: .7rem; }
+  .stks button img { max-height: 100%; width: auto; }
+  .stks button[aria-pressed="true"] { border-color: var(--blanco); background: var(--blanco); color: var(--naranja); }
+  .campo { width: 100%; padding: .8rem 1rem; border-radius: 16px; border: 2px solid var(--blanco); background: transparent; color: var(--blanco); font: inherit; font-weight: 800; font-style: italic; font-size: 1.05rem; }
+  .campo::placeholder { color: rgba(255,255,255,.7); }
+
+  /* proceso */
+  .pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: .9rem; position: relative; z-index: 2; }
+  .pasos li { display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start; padding: 1.1rem 1.2rem; border-radius: 22px; background: var(--blanco); }
+  .pasos .n { font-family: var(--display); font-weight: 900; font-style: italic; font-size: 2.6rem; line-height: .9; color: var(--naranja); }
+  .pasos h3 { margin: 0 0 .2rem; font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.2rem; }
+  .pasos p { margin: 0; font-size: .95rem; }
+  .historia { display: grid; gap: 1.6rem; align-items: end; }
+  .historia > * { min-width: 0; }
+  .historia .fig { position: relative; max-width: 420px; justify-self: center; }
+  .historia .fig .estrella-fig { position: absolute; right: -6%; bottom: 8%; width: 34%; }
+
+  /* valores */
+  .valores { background: var(--humo); color: var(--blanco); }
+  .valores .tit { color: var(--naranja); }
+  .valores .sub { color: var(--crema); }
+  .foto-valores { position: relative; border-radius: 26px; overflow: hidden; }
+  .foto-valores img { width: 100%; height: auto; }
+  .foto-valores .pv { position: absolute; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); }
+  .foto-valores .pv[aria-pressed="true"] { background: var(--naranja); color: var(--blanco); border-color: var(--blanco); }
+  .def { margin: 1rem 0 0; min-height: 3em; font-size: 1.05rem; color: var(--crema); }
+  .def b { color: var(--naranja); font-style: italic; }
+
+  /* mundo urbia */
+  .carrusel { display: grid; grid-auto-flow: column; grid-auto-columns: min(78%, 340px); gap: .8rem; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: .8rem; scrollbar-width: none; position: relative; z-index: 2; }
+  .carrusel::-webkit-scrollbar { display: none; }
+  .carrusel button { scroll-snap-align: start; padding: 0; border: 0; border-radius: 24px; overflow: hidden; background: var(--blanco); aspect-ratio: 4 / 5; position: relative; }
+  .carrusel button img { width: 100%; height: 100%; object-fit: cover; }
+  .carrusel button.cont img { object-fit: contain; padding: 8%; }
+  .carrusel .cap { position: absolute; left: .7rem; bottom: .7rem; padding: .25rem .7rem; border-radius: 999px; background: var(--blanco); color: var(--naranja); font-weight: 800; font-style: italic; font-size: .85rem; }
+  .desliza { display: flex; justify-content: space-between; align-items: center; margin-top: .4rem; font-size: .82rem; font-weight: 700; position: relative; z-index: 2; }
+
+  .visor { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgba(35,35,35,.92); padding: calc(1rem + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(1rem + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+  .visor img { max-height: 84vh; width: auto; border-radius: 18px; }
+  .visor button { position: absolute; top: calc(.8rem + env(safe-area-inset-top, 0px)); right: max(.8rem, env(safe-area-inset-right, 0px)); width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 0; background: var(--naranja); color: var(--blanco); font-weight: 800; }
+
+  /* cierre */
+  .final { background: var(--naranja); color: var(--blanco); overflow: hidden; }
+  .final .dentro { position: relative; z-index: 2; display: grid; gap: 1.4rem; justify-items: start; }
+  .final .logo-final { width: min(100%, 720px); height: auto; }
+  .final p { margin: 0; max-width: 36ch; font-size: 1.1rem; }
+  .final .lmy { position: absolute; right: 4%; top: 6%; width: min(36%, 220px); transform: rotate(8deg); z-index: 3; }
+  .contacto { display: grid; gap: .6rem; }
+  .contacto .dato { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-weight: 700; }
+  footer { background: var(--humo); color: var(--crema); padding-block: 1.4rem calc(5.5rem + env(safe-area-inset-bottom, 0px)); font-size: .85rem; }
+  footer .fila { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; align-items: center; }
+  footer img { height: 1.2rem; width: auto; }
+
+  /* botón flotante de pedido */
+  .flotante { position: fixed; z-index: 45; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: inline-flex; align-items: center; gap: .55rem;
+    padding: .85rem 1.2rem; border-radius: 999px; border: 0; background: var(--humo); color: var(--blanco); font-weight: 800; font-style: italic; box-shadow: 0 10px 24px rgba(35,35,35,.3); }
+  .flotante .n { display: inline-grid; place-items: center; min-width: 1.5rem; height: 1.5rem; padding: 0 .35rem; border-radius: 999px; background: var(--naranja); font-style: normal; font-size: .85rem; }
+
+  .aviso { position: fixed; z-index: 80; left: 50%; bottom: calc(5.4rem + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 150%); opacity: 0; padding: .7rem 1.2rem; border-radius: 999px; background: var(--naranja); color: var(--blanco); font-weight: 800; font-style: italic; max-width: calc(100vw - 32px); text-align: center; transition: transform .3s cubic-bezier(.2,1.4,.4,1), opacity .2s; }
+  .aviso.ver { transform: translate(-50%, 0); opacity: 1; }
+
+  @media (min-width: 46rem) {
+    .barra nav { display: flex; }
+    .barra .bolsa-btn { margin-left: .4rem; }
+    .grilla { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .crea .lab { grid-template-columns: 1fr 1.1fr; align-items: start; }
+    .historia { grid-template-columns: 1.1fr 1fr; }
+    .portada .dentro { grid-template-columns: 1.1fr 1fr; align-items: end; }
+    .escenario { height: 560px; }
+    .escenario .modelo { width: 115%; right: -10%; }
+  }
+  @media (min-width: 70rem) { .grilla { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .brillo i, .cinta div, .portada .logo-xl, .bolsa-btn.salta { animation: none; }
+    .hoja, .velo, .prod .funda, .aviso { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><symbol id="star" viewBox="0 0 100 100"><path d="M50 4 62 38 98 38 69 59 80 94 50 73 20 94 31 59 2 38 38 38Z"/></symbol></defs>
+</svg>
+
+<header class="barra gutter">
+  <div class="fila ancho">
+    <a href="#inicio" aria-label="Urbia, inicio"><img class="logo" src="assets/logo.png" alt="urbia."></a>
+    <nav aria-label="Secciones">
+      <a href="#catalogo">Catálogo</a><a href="#crea">Crea la tuya</a><a href="#como">Cómo funciona</a><a href="#mundo">Mundo Urbia</a>
+    </nav>
+    <button type="button" class="bolsa-btn" id="bolsaBtn" aria-label="Ver tu pedido">Pedido <span class="n" id="nBarra">0</span></button>
+  </div>
+</header>
+
+<section class="portada gutter" id="inicio">
+  <div class="brillo" aria-hidden="true"><i style="--s:120vw;--x:90%;--y:40%;--t:16s"></i><i style="--s:80vw;--x:5%;--y:85%;--t:12s;--dx:-20px;--dy:30px"></i></div>
+  <div class="dentro ancho">
+    <div>
+      <div class="hola"><span class="eti">Fundas para celular</span><span class="eti">Colección 2026</span></div>
+      <img class="logo-xl" src="assets/logo.png" alt="urbia.">
+      <h1 class="tit" style="margin-top:.9rem">De una idea a una <b>forma de expresarte.</b></h1>
+      <p class="sub">Fundas que combinan <b>creatividad, estilo y personalidad</b>. Escoge un diseño de la colección o crea uno con tus propias ideas.</p>
+      <div class="acciones" style="margin-top:1.2rem">
+        <a class="pill" href="#catalogo">Ver catálogo</a>
+        <a class="pill blanca" href="#crea">Crea la tuya</a>
+      </div>
+    </div>
+    <div class="escenario" id="escenario">
+      <img class="modelo" src="assets/mujer-funda.webp" alt="Chica tapándose un ojo con su funda Urbia ilustrada">
+      <div class="sticker" style="left:2%;top:4%;width:min(46%,230px);--r:-10deg"><img src="assets/off-script.png" alt="Sticker Off Script"></div>
+      <div class="sticker" style="right:2%;top:2%;width:min(30%,160px);--r:12deg"><img src="assets/parche-urbia.png" alt="Parche Urbia"></div>
+      <div class="sticker" style="left:4%;top:42%;width:min(40%,210px);--r:-6deg"><img src="assets/little-more-you.png" alt="Sticker A Little More You"></div>
+      <div class="sticker" style="right:4%;bottom:18%;width:min(28%,150px);--r:6deg"><img src="assets/estrella.png" alt="Sticker de estrella"></div>
+      <div class="sticker" style="left:30%;bottom:6%;width:min(20%,110px);--r:-14deg"><img src="assets/sticker-u.png" alt="Sticker U."></div>
+      <span class="pista">Arrastra los stickers</span>
+    </div>
+  </div>
+</section>
+
+<div class="cinta-caja" aria-hidden="true"><div class="cinta"><div id="cinta"></div></div></div>
+
+<section class="sec gutter" id="catalogo">
+  <div class="brillo" aria-hidden="true"><i style="--s:90vw;--x:100%;--y:10%;--t:15s"></i></div>
+  <div class="ancho" style="position:relative;z-index:2">
+    <div class="cabeza">
+      <span class="eti">Catálogo</span>
+      <h2 class="tit">Diseños que conectan contigo, <b>estilos que hablan de ti.</b></h2>
+    </div>
+    <div class="chips" id="filtros" role="group" aria-label="Filtrar el catálogo"></div>
+    <div class="grilla" id="grilla"></div>
+  </div>
+</section>
+
+<section class="sec crea gutter" id="crea">
+  <div class="brillo" aria-hidden="true"><i style="--s:100vw;--x:10%;--y:20%;--t:13s;background:radial-gradient(circle, rgba(255,255,255,.5), rgba(255,255,255,0) 65%)"></i></div>
+  <div class="ancho" style="position:relative;z-index:2">
+    <div class="cabeza">
+      <span class="eti">Diseño exclusivo</span>
+      <h2 class="tit">Tu idea, <b>tu funda.</b></h2>
+      <p class="sub">Arma un boceto: escoge fondo, patrón, sticker y tu nombre. Con eso el equipo de Urbia te prepara la propuesta final.</p>
+    </div>
+    <div class="lab">
+      <div class="vista" id="crVista">
+        <div class="funda" id="crFunda"><span class="cam"></span><span class="txt" id="crTxt"></span><img class="stk" id="crStk" alt="" hidden><img class="marca" src="assets/logo-u.png" alt=""></div>
+        <span class="nota">Arrastra el sticker dentro de la funda</span>
+      </div>
+      <div class="mandos">
+        <div><span class="ctl">Fondo</span><div class="colores" id="crColor"></div></div>
+        <div><span class="ctl">Patrón</span><div class="opc" id="crPatron"></div></div>
+        <div><span class="ctl">Sticker</span><div class="stks" id="crSticker"></div></div>
+        <div><label class="ctl" for="crNombre">Tu nombre o una palabra</label><input class="campo" id="crNombre" maxlength="14" placeholder="Ej. VALE" autocomplete="off"></div>
+        <div><span class="ctl">Modelo de celular</span><div class="opc" id="crModelo"></div></div>
+        <div><button type="button" class="pill blanca" id="crAgregar">Agregar al pedido</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec gutter" id="como">
+  <div class="brillo" aria-hidden="true"><i style="--s:80vw;--x:0%;--y:60%;--t:14s"></i></div>
+  <div class="ancho historia">
+    <div style="position:relative;z-index:2">
+      <div class="cabeza">
+        <span class="eti">Cómo funciona</span>
+        <h2 class="tit">Más que una funda, <b>una forma de expresarte.</b></h2>
+        <p class="sub">Urbia convierte ideas, gustos y referencias en propuestas visuales únicas. Así llega tu diseño exclusivo a tus manos:</p>
+      </div>
+      <ol class="pasos">
+        <li><span class="n">1</span><div><h3>Cuéntanos tu idea</h3><p>Un boceto, una foto, una frase o solo lo que te gusta. Nos lo mandas por WhatsApp.</p></div></li>
+        <li><span class="n">2</span><div><h3>Diseñamos tu propuesta</h3><p>Convertimos esa idea en un diseño pensado para tu modelo de celular.</p></div></li>
+        <li><span class="n">3</span><div><h3>La apruebas y la producimos</h3><p>Cuando te encanta, la imprimimos y te llega lista para llevarla a todas partes.</p></div></li>
+      </ol>
+    </div>
+    <div class="fig">
+      <img src="assets/mujer-pose.webp" alt="Chica con su funda Urbia sobre la cabeza" loading="lazy">
+      <img class="estrella-fig" src="assets/estrella.png" alt="" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<section class="sec valores gutter" id="valores">
+  <div class="ancho">
+    <div class="cabeza">
+      <span class="eti" style="color:var(--crema)">Lo que nos mueve</span>
+      <h2 class="tit">Creatividad, innovación <b>y autenticidad.</b></h2>
+    </div>
+    <div class="foto-valores">
+      <img src="assets/valores.jpg" alt="Tres amigos mostrando sus fundas Urbia" loading="lazy">
+      <button type="button" class="pill blanca chica pv" data-v="0" style="left:20%;top:38%;--r:-4deg" aria-pressed="true">Creatividad</button>
+      <button type="button" class="pill blanca chica pv" data-v="1" style="left:80%;top:52%;--r:4deg" aria-pressed="false">Innovación</button>
+      <button type="button" class="pill blanca chica pv" data-v="2" style="left:48%;top:84%;--r:-2deg" aria-pressed="false">Autenticidad</button>
+    </div>
+    <p class="def" id="def" aria-live="polite"></p>
+  </div>
+</section>
+
+<section class="sec gutter" id="mundo">
+  <div class="brillo" aria-hidden="true"><i style="--s:90vw;--x:85%;--y:30%;--t:16s"></i></div>
+  <div class="ancho" style="position:relative;z-index:2">
+    <div class="cabeza">
+      <span class="eti">Mundo Urbia</span>
+      <h2 class="tit">A little <b>more you.</b></h2>
+    </div>
+    <div class="carrusel" id="carrusel"></div>
+    <div class="desliza"><span>Desliza para ver más</span><span id="contador"></span></div>
+  </div>
+</section>
+
+<section class="sec final gutter" id="contacto">
+  <img class="lmy" src="assets/little-more-you.png" alt="" loading="lazy">
+  <div class="brillo" aria-hidden="true"><i style="--s:100vw;--x:80%;--y:80%;--t:14s;background:radial-gradient(circle, rgba(255,255,255,.4), rgba(255,255,255,0) 65%)"></i></div>
+  <div class="dentro ancho">
+    <img class="logo-final" src="assets/logo-blanco.png" alt="urbia." loading="lazy">
+    <p>Lleva contigo algo que realmente te represente. Escríbenos y armamos tu funda.</p>
+    <div class="contacto" id="contactoDatos"></div>
+    <div class="acciones" style="display:flex;gap:.6rem;flex-wrap:wrap">
+      <a class="pill humo" href="#catalogo">Ver catálogo</a>
+      <a class="pill blanca" href="#crea">Crea la tuya</a>
+    </div>
+  </div>
+</section>
+
+<footer class="gutter">
+  <div class="fila ancho"><img src="assets/logo-blanco.png" alt="urbia."><span>Fundas para celular · 2026</span></div>
+</footer>
+
+<button type="button" class="flotante" id="flotante" aria-label="Ver tu pedido">Tu pedido <span class="n" id="nFlot">0</span></button>
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+<div class="velo" id="velo" hidden></div>
+<div class="hoja" id="hoja" hidden role="dialog" aria-modal="true" aria-labelledby="hojaTit">
+  <div class="agarre"></div>
+  <button type="button" class="cerrar" id="hojaX" aria-label="Cerrar">✕</button>
+  <div id="hojaCuerpo"></div>
+</div>
+<div class="visor" id="visor" hidden><img id="visorImg" alt=""><button type="button" id="visorX" aria-label="Cerrar">✕</button></div>
+
+<script>
+(function () {
+  /* ================= CONFIGURACIÓN (Urbia la puede cambiar aquí) ================= */
+  var CONFIG = {
+    whatsapp: '',            // número con indicativo, sin + ni espacios. Ej: '573001234567'
+    instagram: '',           // usuario sin @. Ej: 'urbia.co'
+    precioPersonalizada: null // precio de la funda personalizada, o null para "Precio a consultar"
+  };
+  var MODELOS = ['iPhone 12', 'iPhone 13', 'iPhone 14', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16', 'iPhone 16 Pro', 'iPhone 16 Pro Max', 'Samsung S24', 'Samsung A55', 'Otro modelo'];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function svgUri(s) { return 'url("data:image/svg+xml,' + encodeURIComponent(s) + '")'; }
+  function plata(v) { return v == null ? 'Precio a consultar' : '$' + Number(v).toLocaleString('es-CO'); }
+  var t0; function avisar(t) { var a = $('aviso'); a.textContent = t; a.classList.add('ver'); clearTimeout(t0); t0 = setTimeout(function () { a.classList.remove('ver'); }, 2200); }
+
+  /* ================= PATRONES ================= */
+  var STAR = '<path d="M50 4 62 38 98 38 69 59 80 94 50 73 20 94 31 59 2 38 38 38Z"/>';
+  var PAT = {
+    rayas: function (a, b) { return { pat: 'repeating-linear-gradient(0deg,' + a + ' 0 11px,' + b + ' 11px 22px)' }; },
+    estrellas: function (a, b) { return { pat: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="' + b + '"/><g fill="' + a + '"><g transform="translate(-10 -6) rotate(-14 50 50) scale(.9)">' + STAR + '</g><g transform="translate(58 62) rotate(18 25 25) scale(.55)">' + STAR + '</g></g></svg>') + ' 0 0/120px 120px' }; },
+    flores: function (a, b) { return { pat: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><rect width="44" height="44" fill="' + b + '"/><g fill="none" stroke="' + a + '" stroke-width="1.6"><circle cx="11" cy="11" r="2.4" fill="' + a + '"/><circle cx="11" cy="6" r="3"/><circle cx="16" cy="11" r="3"/><circle cx="11" cy="16" r="3"/><circle cx="6" cy="11" r="3"/></g><g fill="' + a + '"><circle cx="33" cy="33" r="2"/><circle cx="33" cy="28.5" r="2.2"/><circle cx="37.5" cy="33" r="2.2"/><circle cx="33" cy="37.5" r="2.2"/><circle cx="28.5" cy="33" r="2.2"/></g></svg>') + ' 0 0/44px 44px' }; },
+    cuadros: function (a, b) { var c = a + '80'; return { pat: 'linear-gradient(90deg,' + c + ' 50%, transparent 0) 0 0/18px 18px, linear-gradient(' + c + ' 50%, transparent 0) 0 0/18px 18px, ' + b }; },
+    ajedrez: function (a, b) { return { pat: 'conic-gradient(' + a + ' 25%,' + b + ' 0 50%,' + a + ' 0 75%,' + b + ' 0) 0 0/36px 36px' }; },
+    puntos: function (a, b) { return { pat: 'radial-gradient(circle,' + a + ' 0 5px, transparent 6px) 0 0/26px 26px, ' + b }; },
+    liso: function (a, b) { return { pat: b }; },
+    tiedye: function () { return { pat: 'radial-gradient(ellipse 30% 14% at 30% 30%, #3b2a1e 0 30%, transparent 70%), radial-gradient(ellipse 22% 10% at 70% 22%, #e0622a 0 40%, transparent 80%), radial-gradient(ellipse 26% 12% at 62% 55%, #c8501f 0 35%, transparent 75%), radial-gradient(ellipse 18% 9% at 25% 68%, #f0a24a 0 40%, transparent 80%), radial-gradient(ellipse 24% 10% at 72% 82%, #3b2a1e 0 25%, transparent 70%), radial-gradient(ellipse 16% 8% at 40% 45%, #f6c27a 0 40%, transparent 80%), #f4ece0' }; }
+  };
+
+  /* ================= CATÁLOGO ================= */
+  var C = '#f2f0ea', N = '#ff722c', H = '#232323', AZ = '#2f6fd6';
+  var PRODUCTOS = [
+    { id: 'rayas', nom: 'Rayas Urbia', cat: 'Patrones', pat: PAT.rayas(N, C), precio: null, nuevo: true, txt: 'Rayas naranja y crema, el clásico de la marca. Va con todo.' },
+    { id: 'estrellas', nom: 'Off Script Stars', cat: 'Patrones', pat: PAT.estrellas(N, C), precio: null, txt: 'Estrellas grandes en naranja sobre crema, para los que no siguen el guion.' },
+    { id: 'flor', nom: 'Flor Crema', cat: 'Patrones', pat: PAT.flores(N, '#f6e8dc'), precio: null, txt: 'Florecitas naranja sobre crema rosado. Suave pero con carácter.' },
+    { id: 'doodle', nom: 'Doodle Club', cat: 'Ilustradas', img: 'assets/tex-doodle.jpg', precio: null, nuevo: true, txt: 'Dibujos de colores: gatos, soles y nubes. Pura alegría en tu mano.' },
+    { id: 'tiedye', nom: 'Tie Dye Fuego', cat: 'Ilustradas', pat: PAT.tiedye(), precio: null, txt: 'Manchas cálidas en tonos fuego sobre crema. Ninguna sale igual.' },
+    { id: 'gingham', nom: 'Cuadros Azul', cat: 'Patrones', pat: PAT.cuadros(AZ, '#e8f0fb'), precio: null, txt: 'Cuadros vichy en azul, fresco y de picnic.' },
+    { id: 'screenshot', nom: 'Screenshot', cat: 'Frases', pat: PAT.liso(N, '#efe7d8'), frase: 'Hay we always have the money to buy the things we screenshot', precio: null, txt: 'Para los que tienen la galería llena de cosas que quieren comprar.' },
+    { id: 'naranja', nom: 'Urbia Orange', cat: 'Básicas', pat: PAT.liso(N, N), marca: 'assets/logo-u-blanco.png', precio: null, txt: 'Naranja Urbia liso con la U. en blanco. Directa y llamativa.' },
+    { id: 'smoke', nom: 'Urbia Smoke', cat: 'Básicas', pat: PAT.liso(N, H), marca: 'assets/logo-u.png', precio: null, txt: 'Humo oscuro con la U. en naranja. Sobria, con el toque de la marca.' },
+    { id: 'ajedrez', nom: 'Check Naranja', cat: 'Patrones', pat: PAT.ajedrez(N, C), precio: null, txt: 'Ajedrez naranja y crema, urbano y gráfico.' }
+  ];
+
+  function fundaHTML(p, extra) {
+    var st = p.img ? 'background-image:url(' + p.img + ');background-size:cover' : '--pat:' + p.pat.pat.replace(/"/g, "'");
+    var h = '<div class="funda" style="' + st + '">' + '<span class="cam"></span>';
+    if (p.frase) h += '<span class="frase" style="--fs:' + (extra && extra.fs || '.62rem') + '">' + p.frase + '</span>';
+    h += '<img class="marca" src="' + (p.marca || 'assets/logo-u.png') + '" alt="">';
+    return h + '</div>';
+  }
+
+  var CATS = ['Todas', 'Patrones', 'Ilustradas', 'Frases', 'Básicas'], filtro = 'Todas';
+  CATS.forEach(function (c) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = c; b.setAttribute('aria-pressed', String(c === filtro));
+    b.addEventListener('click', function () { filtro = c; Array.prototype.forEach.call($('filtros').children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); pintaGrilla(); });
+    $('filtros').appendChild(b);
+  });
+  function pintaGrilla() {
+    var g = $('grilla'); g.innerHTML = '';
+    PRODUCTOS.filter(function (p) { return filtro === 'Todas' || p.cat === filtro; }).forEach(function (p) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'prod'; b.setAttribute('aria-label', p.nom + ', ' + p.cat + '. Ver detalle');
+      b.innerHTML = '<div class="vitrina">' + (p.nuevo ? '<span class="badge">Nuevo</span>' : '') + fundaHTML(p) + '</div>' +
+        '<div class="info"><div><h3>' + p.nom + '</h3><div class="cat">' + p.cat + '</div><div class="precio">' + plata(p.precio) + '</div></div><span class="mas" aria-hidden="true">+</span></div>';
+      b.addEventListener('click', function () { abrirDetalle(p); });
+      g.appendChild(b);
+    });
+  }
+  pintaGrilla();
+
+  /* ================= HOJA INFERIOR ================= */
+  var ultimoFoco = null;
+  function abrirHoja(html) {
+    ultimoFoco = document.activeElement;
+    $('hojaCuerpo').innerHTML = html; $('velo').hidden = false; $('hoja').hidden = false;
+    requestAnimationFrame(function () { $('velo').classList.add('ver'); $('hoja').classList.add('ver'); });
+    document.body.style.overflow = 'hidden'; setTimeout(function () { $('hojaX').focus(); }, 50);
+  }
+  function cerrarHoja() {
+    $('velo').classList.remove('ver'); $('hoja').classList.remove('ver'); document.body.style.overflow = '';
+    setTimeout(function () { $('velo').hidden = true; $('hoja').hidden = true; }, quieto ? 0 : 320);
+    if (ultimoFoco) ultimoFoco.focus();
+  }
+  $('hojaX').addEventListener('click', cerrarHoja); $('velo').addEventListener('click', cerrarHoja);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { if (!$('hoja').hidden) cerrarHoja(); if (!$('visor').hidden) $('visor').hidden = true; } });
+
+  function botonesModelo(cont, sel, alTocar) {
+    MODELOS.forEach(function (m) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = m; b.setAttribute('aria-pressed', String(m === sel));
+      b.addEventListener('click', function () { Array.prototype.forEach.call(cont.children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); alTocar(m); });
+      cont.appendChild(b);
+    });
+  }
+
+  function abrirDetalle(p) {
+    var modelo = null, cant = 1;
+    abrirHoja('<div class="det"><div class="vista"><div class="brillo" aria-hidden="true"><i style="--s:120%;--x:50%;--y:50%"></i></div>' + fundaHTML(p, { fs: '.8rem' }) + '</div>' +
+      '<div><span class="eti">' + p.cat + '</span><h3 id="hojaTit">' + p.nom + '</h3></div><p>' + p.txt + '</p>' +
+      '<div><span class="ctl">Escoge tu modelo</span><div class="modelos" id="detModelos"></div></div>' +
+      '<div class="pie-hoja"><div class="cant"><button type="button" id="menos" aria-label="Quitar una">−</button><span id="cantN">1</span><button type="button" id="mas" aria-label="Agregar una">+</button></div>' +
+      '<strong style="color:var(--naranja)">' + plata(p.precio) + '</strong></div>' +
+      '<button type="button" class="pill" id="detAgregar">Agregar al pedido</button></div>');
+    botonesModelo($('detModelos'), null, function (m) { modelo = m; });
+    $('menos').addEventListener('click', function () { cant = Math.max(1, cant - 1); $('cantN').textContent = cant; });
+    $('mas').addEventListener('click', function () { cant = Math.min(9, cant + 1); $('cantN').textContent = cant; });
+    $('detAgregar').addEventListener('click', function () {
+      if (!modelo) { avisar('Escoge el modelo de tu celular'); return; }
+      agregar({ id: p.id, nom: p.nom, det: modelo, cant: cant, precio: p.precio });
+      cerrarHoja();
+    });
+  }
+
+  /* ================= PEDIDO ================= */
+  var pedido = [];
+  try { pedido = JSON.parse(localStorage.getItem('urbia-pedido') || '[]') || []; } catch (e) { pedido = []; }
+  function guardar() { try { localStorage.setItem('urbia-pedido', JSON.stringify(pedido)); } catch (e) {} }
+  function contar() { var n = pedido.reduce(function (s, x) { return s + x.cant; }, 0); $('nBarra').textContent = n; $('nFlot').textContent = n; $('flotante').hidden = n === 0; return n; }
+  function agregar(item) {
+    var igual = pedido.filter(function (x) { return x.id === item.id && x.det === item.det; })[0];
+    if (igual && item.id !== 'personalizada') igual.cant += item.cant; else pedido.push(item);
+    guardar(); contar(); avisar('Agregada a tu pedido');
+    var b = $('bolsaBtn'); b.classList.remove('salta'); void b.offsetWidth; b.classList.add('salta');
+  }
+  function textoPedido() {
+    var l = ['Hola Urbia, quiero hacer este pedido:', ''];
+    pedido.forEach(function (x, i) { l.push((i + 1) + '. ' + x.nom + ' x' + x.cant + ' (' + x.det + ')'); });
+    return l.join('\n');
+  }
+  function abrirPedido() {
+    if (!pedido.length) {
+      abrirHoja('<div class="det"><h3 id="hojaTit">Tu pedido</h3><div class="vacio">Todavía no tienes fundas. Escoge una del catálogo o crea la tuya.</div><a class="pill" href="#catalogo" id="irCat">Ver catálogo</a></div>');
+      $('irCat').addEventListener('click', cerrarHoja); return;
+    }
+    var h = '<div class="det"><h3 id="hojaTit">Tu pedido</h3><ul class="pedido-lista">';
+    pedido.forEach(function (x, i) {
+      var p = PRODUCTOS.filter(function (q) { return q.id === x.id; })[0];
+      var mini = p ? fundaHTML(p) : '<div class="funda" style="--pat:' + (x.pat || '#ff722c').replace(/"/g, "'") + '"><span class="cam"></span></div>';
+      h += '<li>' + mini + '<div style="min-width:0"><b>' + x.nom + ' ×' + x.cant + '</b><small>' + x.det + '</small></div><button type="button" class="quitar" data-i="' + i + '" aria-label="Quitar ' + x.nom + '">✕</button></li>';
+    });
+    h += '</ul><p class="resumen" id="resumen"></p>';
+    if (CONFIG.whatsapp) h += '<a class="pill" target="_blank" rel="noopener" href="https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(textoPedido()) + '">Enviar pedido por WhatsApp</a>';
+    else h += '<p style="font-size:.88rem">El número de WhatsApp de Urbia está por confirmar. Copia el pedido y envíalo por mensaje.</p>';
+    h += '<button type="button" class="pill blanca" id="copiarPed">Copiar pedido</button></div>';
+    abrirHoja(h);
+    $('resumen').textContent = textoPedido();
+    Array.prototype.forEach.call(document.querySelectorAll('.quitar'), function (b) {
+      b.addEventListener('click', function () { pedido.splice(+b.dataset.i, 1); guardar(); contar(); abrirPedido(); });
+    });
+    $('copiarPed').addEventListener('click', function () {
+      var t = textoPedido();
+      function sel() { var r = document.createRange(); r.selectNodeContents($('resumen')); var s = getSelection(); s.removeAllRanges(); s.addRange(r); avisar('Selecciona y copia el texto'); }
+      try { navigator.clipboard.writeText(t).then(function () { avisar('Pedido copiado'); }, sel); } catch (e) { sel(); }
+    });
+  }
+  $('bolsaBtn').addEventListener('click', abrirPedido); $('flotante').addEventListener('click', abrirPedido);
+  contar();
+
+  /* ================= CREA LA TUYA ================= */
+  var FONDOS = { crema: ['Crema', C, N, H], naranja: ['Naranja', N, C, H], humo: ['Humo', H, N, N], azul: ['Azul', '#e8f0fb', AZ, AZ] };
+  var PATRONES = { liso: 'Liso', rayas: 'Rayas', estrellas: 'Estrellas', cuadros: 'Cuadros', puntos: 'Puntos', flores: 'Flores' };
+  var STKS = { ninguno: ['Sin sticker', null], off: ['Off Script', 'assets/off-script.png'], lmy: ['A Little More You', 'assets/little-more-you.png'], est: ['Estrella', 'assets/estrella.png'], parche: ['Parche Urbia', 'assets/parche-urbia.png'], u: ['U.', 'assets/sticker-u.png'] };
+  var cr = { fondo: 'crema', patron: 'estrellas', stk: 'off', nombre: '', modelo: null };
+  function grupo(cont, datos, act, pinta, alTocar) {
+    Object.keys(datos).forEach(function (k) {
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(k === act)); pinta(b, k, datos[k]);
+      b.addEventListener('click', function () { Array.prototype.forEach.call(cont.children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); alTocar(k); pintaCrea(); });
+      cont.appendChild(b);
+    });
+  }
+  grupo($('crColor'), FONDOS, cr.fondo, function (b, k, d) { b.style.setProperty('--c', d[1]); b.setAttribute('aria-label', 'Fondo ' + d[0]); b.title = d[0]; }, function (k) { cr.fondo = k; });
+  grupo($('crPatron'), PATRONES, cr.patron, function (b, k, d) { b.textContent = d; }, function (k) { cr.patron = k; });
+  grupo($('crSticker'), STKS, cr.stk, function (b, k, d) { b.setAttribute('aria-label', d[0]); b.title = d[0]; b.innerHTML = d[1] ? '<img src="' + d[1] + '" alt="">' : 'Ninguno'; }, function (k) { cr.stk = k; sx = 0; sy = 0; });
+  botonesModelo($('crModelo'), null, function (m) { cr.modelo = m; });
+  $('crNombre').addEventListener('input', function () { cr.nombre = this.value.toUpperCase(); pintaCrea(); });
+  var sx = 0, sy = 0;
+  function patronCrea() { var f = FONDOS[cr.fondo]; return PAT[cr.patron](f[2], f[1]); }
+  function pintaCrea() {
+    var f = FONDOS[cr.fondo], p = patronCrea(), el = $('crFunda');
+    el.style.setProperty('--pat', p.pat);
+    var t = $('crTxt'); t.textContent = cr.nombre; t.style.setProperty('--tc', cr.fondo === 'crema' || cr.fondo === 'azul' ? f[2] : '#ffffff'); t.style.setProperty('--ts', cr.fondo === 'humo' ? '#ff722c' : '#232323');
+    t.style.setProperty('--fs', cr.nombre.length > 8 ? '1.2rem' : '1.6rem');
+    var s = $('crStk'), d = STKS[cr.stk]; s.hidden = !d[1]; if (d[1]) { s.src = d[1]; s.style.setProperty('--sx', sx + 'px'); s.style.setProperty('--sy', sy + 'px'); }
+  }
+  pintaCrea();
+  (function () {
+    var s = $('crStk'), ini = null;
+    s.addEventListener('pointerdown', function (e) { e.preventDefault(); ini = { x: e.clientX - sx, y: e.clientY - sy }; s.setPointerCapture(e.pointerId); });
+    s.addEventListener('pointermove', function (e) {
+      if (!ini) return; var r = $('crFunda').getBoundingClientRect();
+      sx = Math.max(-r.width * .4, Math.min(r.width * .4, e.clientX - ini.x)); sy = Math.max(-r.height * .45, Math.min(r.height * .38, e.clientY - ini.y));
+      s.style.setProperty('--sx', sx + 'px'); s.style.setProperty('--sy', sy + 'px');
+    });
+    ['pointerup', 'pointercancel'].forEach(function (ev) { s.addEventListener(ev, function () { ini = null; }); });
+  })();
+  $('crAgregar').addEventListener('click', function () {
+    if (!cr.modelo) { avisar('Escoge el modelo de tu celular'); return; }
+    var d = 'Fondo ' + FONDOS[cr.fondo][0].toLowerCase() + ', ' + PATRONES[cr.patron].toLowerCase() + ', sticker ' + STKS[cr.stk][0] + (cr.nombre ? ', texto "' + cr.nombre + '"' : '') + ' · ' + cr.modelo;
+    agregar({ id: 'personalizada', nom: 'Funda personalizada', det: d, cant: 1, precio: CONFIG.precioPersonalizada, pat: patronCrea().pat });
+  });
+
+  /* ================= STICKERS ARRASTRABLES DE LA PORTADA ================= */
+  Array.prototype.forEach.call(document.querySelectorAll('#escenario .sticker'), function (el) {
+    var x = 0, y = 0, ini = null, z = 3;
+    el.addEventListener('pointerdown', function (e) { ini = { x: e.clientX - x, y: e.clientY - y }; el.setPointerCapture(e.pointerId); el.style.zIndex = ++window.__zUrbia || (window.__zUrbia = 10); });
+    el.addEventListener('pointermove', function (e) {
+      if (!ini) return; var r = $('escenario').getBoundingClientRect();
+      x = Math.max(-r.width * .6, Math.min(r.width * .6, e.clientX - ini.x)); y = Math.max(-r.height * .5, Math.min(r.height * .5, e.clientY - ini.y));
+      el.style.setProperty('--dx', x + 'px'); el.style.setProperty('--dy', y + 'px');
+    });
+    ['pointerup', 'pointercancel'].forEach(function (ev) { el.addEventListener(ev, function () { ini = null; }); });
+  });
+
+  /* ================= CINTA ================= */
+  var palabras = ['Creatividad', 'Innovación', 'Autenticidad', 'Off script', 'A little more you'], c = '';
+  for (var i = 0; i < 4; i++) palabras.forEach(function (p) { c += '<span>' + p + '</span><svg aria-hidden="true"><use href="#star"/></svg>'; });
+  $('cinta').innerHTML = c + c;
+
+  /* ================= VALORES ================= */
+  var DEF = [['Creatividad', 'cada idea se convierte en un diseño que no existía antes.'], ['Innovación', 'nuevas formas de llevar tu estilo en algo que usas todos los días.'], ['Autenticidad', 'cada funda representa a quien la lleva, no a una tendencia.']];
+  function pintaDef(i) { $('def').innerHTML = '<b>' + DEF[i][0] + ':</b> ' + DEF[i][1]; }
+  Array.prototype.forEach.call(document.querySelectorAll('.pv'), function (b) {
+    b.addEventListener('click', function () { Array.prototype.forEach.call(document.querySelectorAll('.pv'), function (x) { x.setAttribute('aria-pressed', String(x === b)); }); pintaDef(+b.dataset.v); });
+  });
+  pintaDef(0);
+
+  /* ================= MUNDO URBIA ================= */
+  var MUNDO = [['helicoptero.jpg', 'Llega desde el cielo', 0], ['grupo-cielo.jpg', 'Con la crew', 0], ['tote.jpg', 'Tote bag', 0], ['gorra.jpg', 'Gorra U.', 0], ['esqueleto.jpg', 'Esqueleto Urbia', 0],
+    ['cajas.jpg', 'Caja de regalo', 0], ['tarjetas.webp', 'Welcome to the club', 1], ['bolsa-u.webp', 'Bolsa U.', 1], ['etiqueta.webp', 'Etiqueta', 1], ['hero.jpg', 'En la calle', 0]];
+  MUNDO.forEach(function (m) {
+    var b = document.createElement('button'); b.type = 'button'; if (m[2]) b.className = 'cont';
+    b.setAttribute('aria-label', 'Ver grande: ' + m[1]);
+    b.innerHTML = '<img src="assets/' + m[0] + '" alt="' + m[1] + '" loading="lazy"><span class="cap">' + m[1] + '</span>';
+    b.addEventListener('click', function () { $('visorImg').src = 'assets/' + m[0]; $('visorImg').alt = m[1]; $('visor').hidden = false; $('visorX').focus(); });
+    $('carrusel').appendChild(b);
+  });
+  $('contador').textContent = MUNDO.length + ' piezas';
+  $('visorX').addEventListener('click', function () { $('visor').hidden = true; });
+  $('visor').addEventListener('click', function (e) { if (e.target === $('visor')) $('visor').hidden = true; });
+
+  /* ================= CONTACTO ================= */
+  var cd = '';
+  if (CONFIG.instagram) cd += '<div class="dato">Instagram: <a style="color:inherit" target="_blank" rel="noopener" href="https://instagram.com/' + CONFIG.instagram + '">@' + CONFIG.instagram + '</a></div>';
+  if (CONFIG.whatsapp) cd += '<div class="dato">WhatsApp: <span>+' + CONFIG.whatsapp + '</span><a class="pill humo chica" target="_blank" rel="noopener" href="https://wa.me/' + CONFIG.whatsapp + '">Escribir</a></div>';
+  $('contactoDatos').innerHTML = cd;
+})();
+</script>
+</body>
+</html>
