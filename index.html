@@ -96,12 +96,14 @@
   .chips::-webkit-scrollbar { display: none; }
   .chips button { flex: none; padding: .5rem 1rem; border-radius: 999px; border: 2px solid var(--naranja); background: var(--blanco); color: var(--naranja); font-weight: 800; font-style: italic; }
   .chips button[aria-pressed="true"] { background: var(--naranja); color: var(--blanco); }
+  .genero { display: grid; grid-template-columns: repeat(3, 1fr); gap: .3rem; padding: .3rem; margin-bottom: .8rem; border-radius: 999px; background: var(--humo); max-width: 420px; }
+  .genero button { padding: .7rem .5rem; border: 0; border-radius: 999px; background: transparent; color: var(--blanco); font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.02rem; }
+  .genero button[aria-pressed="true"] { background: var(--naranja); }
+  .cuenta { margin: -.4rem 0 1rem; font-size: .85rem; font-weight: 700; opacity: .65; }
   .grilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.6rem .9rem; }
   .prod { display: grid; gap: .6rem; padding: 0; border: 0; background: none; text-align: left; }
   .prod .vitrina { position: relative; display: grid; place-items: center; aspect-ratio: 4 / 5; border-radius: 22px; background: var(--blanco); overflow: hidden; }
   .prod .vitrina::before { content: ""; position: absolute; width: 90%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, rgba(255,114,44,.38), rgba(255,114,44,0) 66%); }
-  .prod .funda { width: 46%; transform: rotate(-8deg); transition: transform .35s cubic-bezier(.3,1.5,.5,1); }
-  .prod:hover .funda, .prod:focus-visible .funda { transform: rotate(0deg) translateY(-6px) scale(1.04); }
   .prod .info { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
   .prod .info > div { min-width: 0; }
   .prod h3 { margin: 0; font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.08rem; line-height: 1.1; }
@@ -110,14 +112,11 @@
   .prod .mas { flex: none; display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border-radius: 50%; background: var(--naranja); color: var(--blanco); font-size: 1.4rem; font-weight: 700; line-height: 1; }
   .prod .badge { position: absolute; top: .7rem; left: .7rem; z-index: 2; padding: .2rem .6rem; border-radius: 999px; background: var(--humo); color: var(--blanco); font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 
-  /* la funda dibujada */
-  .funda { position: relative; aspect-ratio: 9 / 18.6; border-radius: 17% / 8.5%; border: 3px solid var(--humo); background: var(--pat, var(--crema)); overflow: hidden; box-shadow: inset -8px 0 14px -10px rgba(0,0,0,.35), 6px 10px 22px rgba(35,35,35,.18); }
-  .funda .cam { position: absolute; left: 8%; top: 4%; width: 40%; aspect-ratio: 1; border-radius: 26%; background: rgba(35,35,35,.92);
-    background-image: radial-gradient(circle at 30% 30%, #4a4a4a 0 14%, #111 15% 21%, transparent 22%), radial-gradient(circle at 30% 72%, #4a4a4a 0 14%, #111 15% 21%, transparent 22%), radial-gradient(circle at 72% 50%, #4a4a4a 0 14%, #111 15% 21%, transparent 22%); }
-  .funda .marca { position: absolute; left: 50%; bottom: 7%; width: 18%; transform: translateX(-50%); opacity: .85; }
-  .funda .frase { position: absolute; inset: 30% 10% auto; font-family: var(--mano); color: #2a3c8f; text-align: center; font-size: var(--fs, 1rem); line-height: 1.15; text-transform: uppercase; }
-  .funda .stk { position: absolute; left: 50%; top: 55%; width: 70%; transform: translate(calc(-50% + var(--sx, 0px)), calc(-50% + var(--sy, 0px))) rotate(-8deg); touch-action: none; }
-  .funda .txt { position: absolute; left: 0; right: 0; top: 28%; text-align: center; font-family: var(--display); font-weight: 900; font-style: italic; font-size: var(--fs, 1.4rem); line-height: 1; color: var(--tc, var(--blanco)); text-shadow: 2px 2px 0 var(--ts, var(--humo)); overflow-wrap: anywhere; padding: 0 8%; }
+  /* foto de la funda (mockup recortado, con su sombra) */
+  .foto-funda { position: relative; z-index: 1; display: block; width: 100%; height: auto; }
+  .prod .foto-funda { width: 86%; margin-top: 7%; transition: transform .35s cubic-bezier(.3,1.5,.5,1); }
+  .prod:hover .foto-funda, .prod:focus-visible .foto-funda { transform: translateY(-6px) scale(1.04); }
+  .prod .gen { position: absolute; top: .7rem; right: .7rem; z-index: 2; padding: .2rem .6rem; border-radius: 999px; background: var(--crema); color: var(--humo); font-size: .7rem; font-weight: 700; letter-spacing: .04em; }
 
   /* hoja inferior (detalle y pedido) */
   .velo { position: fixed; inset: 0; z-index: 60; background: rgba(35,35,35,.5); opacity: 0; transition: opacity .25s ease; }
@@ -130,7 +129,8 @@
   .hoja .cerrar { z-index: 3; box-shadow: 0 2px 8px rgba(35,35,35,.15); position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); top: .8rem; width: 2.4rem; height: 2.4rem; border-radius: 50%; border: 0; background: var(--blanco); font-size: 1.1rem; font-weight: 700; }
   .det { display: grid; gap: 1rem; max-width: 760px; margin: 0 auto; }
   .det .vista { position: relative; display: grid; place-items: center; padding-block: 1.4rem; border-radius: 22px; background: var(--blanco); overflow: hidden; }
-  .det .vista .funda { width: min(38%, 170px); transform: rotate(-6deg); }
+  .det .vista { padding-block: .4rem; }
+  .det .vista .foto-funda { width: min(78%, 360px); }
   .det h3 { margin: 0; font-family: var(--display); font-weight: 800; font-style: italic; font-size: 1.7rem; line-height: 1; color: var(--naranja); }
   .det p { margin: 0; }
   .ctl { display: block; margin-bottom: .45rem; font-weight: 800; font-size: .92rem; }
@@ -144,36 +144,12 @@
 
   .pedido-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
   .pedido-lista li { display: grid; grid-template-columns: 2.6rem 1fr auto; gap: .8rem; align-items: center; padding: .7rem; border-radius: 18px; background: var(--blanco); }
-  .pedido-lista .funda { width: 2.6rem; border-width: 2px; box-shadow: none; }
+  .pedido-lista .mini { width: 2.6rem; height: 3.2rem; object-fit: contain; }
   .pedido-lista b { display: block; font-style: italic; }
   .pedido-lista small { display: block; opacity: .7; }
   .pedido-lista .quitar { border: 0; background: var(--crema); width: 2rem; height: 2rem; border-radius: 50%; font-weight: 700; }
   .vacio { padding: 1.4rem; border-radius: 18px; background: var(--blanco); text-align: center; }
   .resumen { white-space: pre-wrap; font-size: .85rem; padding: .8rem; border-radius: 14px; background: var(--blanco); max-height: 9rem; overflow: auto; }
-
-  /* crea la tuya */
-  .crea { background: var(--naranja); color: var(--blanco); overflow: hidden; }
-  .crea .tit { color: var(--blanco); }
-  .crea .sub { color: var(--blanco); }
-  .crea .lab { display: grid; grid-template-columns: 1fr; gap: 1.4rem; position: relative; z-index: 2; }
-  .crea .lab > * { min-width: 0; }
-  .crea .vista { position: relative; display: grid; place-items: center; padding-block: 1.8rem; border-radius: 28px; background: var(--crema); overflow: hidden; }
-  .crea .vista .funda { width: min(46%, 220px); }
-  .crea .vista .nota { position: absolute; bottom: .7rem; left: 0; right: 0; text-align: center; font-size: .78rem; font-weight: 700; color: var(--humo); opacity: .7; }
-  .mandos { display: grid; gap: 1.1rem; }
-  .mandos .ctl { color: var(--blanco); }
-  .colores { display: flex; gap: .55rem; flex-wrap: wrap; }
-  .colores button { width: 2.6rem; height: 2.6rem; border-radius: 50%; border: 3px solid var(--blanco); background: var(--c); padding: 0; }
-  .colores button[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--naranja), 0 0 0 6px var(--blanco); }
-  .opc { display: flex; gap: .4rem; flex-wrap: wrap; }
-  .opc button { border-color: rgba(255,255,255,.6); background: transparent; color: var(--blanco); }
-  .opc button[aria-pressed="true"] { border-color: var(--blanco); background: var(--blanco); color: var(--naranja); }
-  .stks { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: .4rem; }
-  .stks button { aspect-ratio: 1; display: grid; place-items: center; padding: .25rem; border-radius: 14px; border: 2px solid rgba(255,255,255,.5); background: rgba(255,255,255,.14); color: var(--blanco); font-weight: 800; font-size: .7rem; }
-  .stks button img { max-height: 100%; width: auto; }
-  .stks button[aria-pressed="true"] { border-color: var(--blanco); background: var(--blanco); color: var(--naranja); }
-  .campo { width: 100%; padding: .8rem 1rem; border-radius: 16px; border: 2px solid var(--blanco); background: transparent; color: var(--blanco); font: inherit; font-weight: 800; font-style: italic; font-size: 1.05rem; }
-  .campo::placeholder { color: rgba(255,255,255,.7); }
 
   /* proceso */
   .pasos { list-style: none; margin: 0; padding: 0; display: grid; gap: .9rem; position: relative; z-index: 2; }
@@ -234,7 +210,6 @@
     .barra nav { display: flex; }
     .barra .bolsa-btn { margin-left: .4rem; }
     .grilla { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .crea .lab { grid-template-columns: 1fr 1.1fr; align-items: start; }
     .historia { grid-template-columns: 1.1fr 1fr; }
     .portada .dentro { grid-template-columns: 1.1fr 1fr; align-items: end; }
     .escenario { height: 560px; }
@@ -244,7 +219,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .brillo i, .cinta div, .portada .logo-xl, .bolsa-btn.salta { animation: none; }
-    .hoja, .velo, .prod .funda, .aviso { transition: none; }
+    .hoja, .velo, .prod .foto-funda, .aviso { transition: none; }
   }
 </style>
 </head>
@@ -258,7 +233,7 @@
   <div class="fila ancho">
     <a href="#inicio" aria-label="Urbia, inicio"><img class="logo" src="assets/logo.png" alt="urbia."></a>
     <nav aria-label="Secciones">
-      <a href="#catalogo">Catálogo</a><a href="#crea">Crea la tuya</a><a href="#como">Cómo funciona</a><a href="#mundo">Mundo Urbia</a>
+      <a href="#catalogo">Catálogo</a><a href="#como">Cómo funciona</a><a href="#mundo">Mundo Urbia</a>
     </nav>
     <button type="button" class="bolsa-btn" id="bolsaBtn" aria-label="Ver tu pedido">Pedido <span class="n" id="nBarra">0</span></button>
   </div>
@@ -271,10 +246,10 @@
       <div class="hola"><span class="eti">Fundas para celular</span><span class="eti">Colección 2026</span></div>
       <img class="logo-xl" src="assets/logo.png" alt="urbia.">
       <h1 class="tit" style="margin-top:.9rem">De una idea a una <b>forma de expresarte.</b></h1>
-      <p class="sub">Fundas que combinan <b>creatividad, estilo y personalidad</b>. Escoge un diseño de la colección o crea uno con tus propias ideas.</p>
+      <p class="sub">Fundas que combinan <b>creatividad, estilo y personalidad</b>. Escoge tu diseño de la colección, para él y para ella, y llévalo a todas partes.</p>
       <div class="acciones" style="margin-top:1.2rem">
-        <a class="pill" href="#catalogo">Ver catálogo</a>
-        <a class="pill blanca" href="#crea">Crea la tuya</a>
+        <a class="pill" href="#catalogo" data-gen="Mujer">Mujer</a>
+        <a class="pill blanca" href="#catalogo" data-gen="Hombre">Hombre</a>
       </div>
     </div>
     <div class="escenario" id="escenario">
@@ -298,33 +273,10 @@
       <span class="eti">Catálogo</span>
       <h2 class="tit">Diseños que conectan contigo, <b>estilos que hablan de ti.</b></h2>
     </div>
-    <div class="chips" id="filtros" role="group" aria-label="Filtrar el catálogo"></div>
+    <div class="genero" id="genero" role="group" aria-label="Para quién"></div>
+    <div class="chips" id="filtros" role="group" aria-label="Filtrar por estilo"></div>
+    <p class="cuenta" id="cuenta" aria-live="polite"></p>
     <div class="grilla" id="grilla"></div>
-  </div>
-</section>
-
-<section class="sec crea gutter" id="crea">
-  <div class="brillo" aria-hidden="true"><i style="--s:100vw;--x:10%;--y:20%;--t:13s;background:radial-gradient(circle, rgba(255,255,255,.5), rgba(255,255,255,0) 65%)"></i></div>
-  <div class="ancho" style="position:relative;z-index:2">
-    <div class="cabeza">
-      <span class="eti">Diseño exclusivo</span>
-      <h2 class="tit">Tu idea, <b>tu funda.</b></h2>
-      <p class="sub">Arma un boceto: escoge fondo, patrón, sticker y tu nombre. Con eso el equipo de Urbia te prepara la propuesta final.</p>
-    </div>
-    <div class="lab">
-      <div class="vista" id="crVista">
-        <div class="funda" id="crFunda"><span class="cam"></span><span class="txt" id="crTxt"></span><img class="stk" id="crStk" alt="" hidden><img class="marca" src="assets/logo-u.png" alt=""></div>
-        <span class="nota">Arrastra el sticker dentro de la funda</span>
-      </div>
-      <div class="mandos">
-        <div><span class="ctl">Fondo</span><div class="colores" id="crColor"></div></div>
-        <div><span class="ctl">Patrón</span><div class="opc" id="crPatron"></div></div>
-        <div><span class="ctl">Sticker</span><div class="stks" id="crSticker"></div></div>
-        <div><label class="ctl" for="crNombre">Tu nombre o una palabra</label><input class="campo" id="crNombre" maxlength="14" placeholder="Ej. VALE" autocomplete="off"></div>
-        <div><span class="ctl">Modelo de celular</span><div class="opc" id="crModelo"></div></div>
-        <div><button type="button" class="pill blanca" id="crAgregar">Agregar al pedido</button></div>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -335,12 +287,12 @@
       <div class="cabeza">
         <span class="eti">Cómo funciona</span>
         <h2 class="tit">Más que una funda, <b>una forma de expresarte.</b></h2>
-        <p class="sub">Urbia convierte ideas, gustos y referencias en propuestas visuales únicas. Así llega tu diseño exclusivo a tus manos:</p>
+        <p class="sub">Escoger tu funda Urbia toma un minuto. Así llega a tus manos:</p>
       </div>
       <ol class="pasos">
-        <li><span class="n">1</span><div><h3>Cuéntanos tu idea</h3><p>Un boceto, una foto, una frase o solo lo que te gusta. Nos lo mandas por WhatsApp.</p></div></li>
-        <li><span class="n">2</span><div><h3>Diseñamos tu propuesta</h3><p>Convertimos esa idea en un diseño pensado para tu modelo de celular.</p></div></li>
-        <li><span class="n">3</span><div><h3>La apruebas y la producimos</h3><p>Cuando te encanta, la imprimimos y te llega lista para llevarla a todas partes.</p></div></li>
+        <li><span class="n">1</span><div><h3>Escoge tu diseño</h3><p>Explora el catálogo de mujer y hombre y toca la funda que más te guste.</p></div></li>
+        <li><span class="n">2</span><div><h3>Dinos tu modelo</h3><p>Escoge el modelo de tu celular y cuántas quieres, y agrégala a tu pedido.</p></div></li>
+        <li><span class="n">3</span><div><h3>Envía tu pedido</h3><p>Nos llega por WhatsApp, te confirmamos y te la entregamos lista para llevarla a todas partes.</p></div></li>
       </ol>
     </div>
     <div class="fig">
@@ -383,11 +335,11 @@
   <div class="brillo" aria-hidden="true"><i style="--s:100vw;--x:80%;--y:80%;--t:14s;background:radial-gradient(circle, rgba(255,255,255,.4), rgba(255,255,255,0) 65%)"></i></div>
   <div class="dentro ancho">
     <img class="logo-final" src="assets/logo-blanco.png" alt="urbia." loading="lazy">
-    <p>Lleva contigo algo que realmente te represente. Escríbenos y armamos tu funda.</p>
+    <p>Lleva contigo algo que realmente te represente. Escríbenos y te ayudamos con tu pedido.</p>
     <div class="contacto" id="contactoDatos"></div>
     <div class="acciones" style="display:flex;gap:.6rem;flex-wrap:wrap">
-      <a class="pill humo" href="#catalogo">Ver catálogo</a>
-      <a class="pill blanca" href="#crea">Crea la tuya</a>
+      <a class="pill humo" href="#catalogo" data-gen="Mujer">Ver mujer</a>
+      <a class="pill blanca" href="#catalogo" data-gen="Hombre">Ver hombre</a>
     </div>
   </div>
 </section>
@@ -411,68 +363,78 @@
   /* ================= CONFIGURACIÓN (Urbia la puede cambiar aquí) ================= */
   var CONFIG = {
     whatsapp: '',            // número con indicativo, sin + ni espacios. Ej: '573001234567'
-    instagram: '',           // usuario sin @. Ej: 'urbia.co'
-    precioPersonalizada: null // precio de la funda personalizada, o null para "Precio a consultar"
+    instagram: ''            // usuario sin @. Ej: 'urbia.co'
   };
   var MODELOS = ['iPhone 12', 'iPhone 13', 'iPhone 14', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 15 Pro Max', 'iPhone 16', 'iPhone 16 Pro', 'iPhone 16 Pro Max', 'Samsung S24', 'Samsung A55', 'Otro modelo'];
 
   var $ = function (id) { return document.getElementById(id); };
   var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function svgUri(s) { return 'url("data:image/svg+xml,' + encodeURIComponent(s) + '")'; }
   function plata(v) { return v == null ? 'Precio a consultar' : '$' + Number(v).toLocaleString('es-CO'); }
   var t0; function avisar(t) { var a = $('aviso'); a.textContent = t; a.classList.add('ver'); clearTimeout(t0); t0 = setTimeout(function () { a.classList.remove('ver'); }, 2200); }
 
-  /* ================= PATRONES ================= */
-  var STAR = '<path d="M50 4 62 38 98 38 69 59 80 94 50 73 20 94 31 59 2 38 38 38Z"/>';
-  var PAT = {
-    rayas: function (a, b) { return { pat: 'repeating-linear-gradient(0deg,' + a + ' 0 11px,' + b + ' 11px 22px)' }; },
-    estrellas: function (a, b) { return { pat: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" fill="' + b + '"/><g fill="' + a + '"><g transform="translate(-10 -6) rotate(-14 50 50) scale(.9)">' + STAR + '</g><g transform="translate(58 62) rotate(18 25 25) scale(.55)">' + STAR + '</g></g></svg>') + ' 0 0/120px 120px' }; },
-    flores: function (a, b) { return { pat: svgUri('<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44"><rect width="44" height="44" fill="' + b + '"/><g fill="none" stroke="' + a + '" stroke-width="1.6"><circle cx="11" cy="11" r="2.4" fill="' + a + '"/><circle cx="11" cy="6" r="3"/><circle cx="16" cy="11" r="3"/><circle cx="11" cy="16" r="3"/><circle cx="6" cy="11" r="3"/></g><g fill="' + a + '"><circle cx="33" cy="33" r="2"/><circle cx="33" cy="28.5" r="2.2"/><circle cx="37.5" cy="33" r="2.2"/><circle cx="33" cy="37.5" r="2.2"/><circle cx="28.5" cy="33" r="2.2"/></g></svg>') + ' 0 0/44px 44px' }; },
-    cuadros: function (a, b) { var c = a + '80'; return { pat: 'linear-gradient(90deg,' + c + ' 50%, transparent 0) 0 0/18px 18px, linear-gradient(' + c + ' 50%, transparent 0) 0 0/18px 18px, ' + b }; },
-    ajedrez: function (a, b) { return { pat: 'conic-gradient(' + a + ' 25%,' + b + ' 0 50%,' + a + ' 0 75%,' + b + ' 0) 0 0/36px 36px' }; },
-    puntos: function (a, b) { return { pat: 'radial-gradient(circle,' + a + ' 0 5px, transparent 6px) 0 0/26px 26px, ' + b }; },
-    liso: function (a, b) { return { pat: b }; },
-    tiedye: function () { return { pat: 'radial-gradient(ellipse 30% 14% at 30% 30%, #3b2a1e 0 30%, transparent 70%), radial-gradient(ellipse 22% 10% at 70% 22%, #e0622a 0 40%, transparent 80%), radial-gradient(ellipse 26% 12% at 62% 55%, #c8501f 0 35%, transparent 75%), radial-gradient(ellipse 18% 9% at 25% 68%, #f0a24a 0 40%, transparent 80%), radial-gradient(ellipse 24% 10% at 72% 82%, #3b2a1e 0 25%, transparent 70%), radial-gradient(ellipse 16% 8% at 40% 45%, #f6c27a 0 40%, transparent 80%), #f4ece0' }; }
-  };
-
-  /* ================= CATÁLOGO ================= */
-  var C = '#f2f0ea', N = '#ff722c', H = '#232323', AZ = '#2f6fd6';
+  /* ================= CATÁLOGO =================
+     Para agregar una funda: copia una línea, cambia id, nombre, imagen (en assets/fundas/), para quién (Mujer/Hombre),
+     estilo (Patrones/Frases/Gráficas) y precio (número sin puntos, o null para "Precio a consultar"). */
+  var F = 'assets/fundas/';
   var PRODUCTOS = [
-    { id: 'rayas', nom: 'Rayas Urbia', cat: 'Patrones', pat: PAT.rayas(N, C), precio: null, nuevo: true, txt: 'Rayas naranja y crema, el clásico de la marca. Va con todo.' },
-    { id: 'estrellas', nom: 'Off Script Stars', cat: 'Patrones', pat: PAT.estrellas(N, C), precio: null, txt: 'Estrellas grandes en naranja sobre crema, para los que no siguen el guion.' },
-    { id: 'flor', nom: 'Flor Crema', cat: 'Patrones', pat: PAT.flores(N, '#f6e8dc'), precio: null, txt: 'Florecitas naranja sobre crema rosado. Suave pero con carácter.' },
-    { id: 'doodle', nom: 'Doodle Club', cat: 'Ilustradas', img: 'assets/tex-doodle.jpg', precio: null, nuevo: true, txt: 'Dibujos de colores: gatos, soles y nubes. Pura alegría en tu mano.' },
-    { id: 'tiedye', nom: 'Tie Dye Fuego', cat: 'Ilustradas', pat: PAT.tiedye(), precio: null, txt: 'Manchas cálidas en tonos fuego sobre crema. Ninguna sale igual.' },
-    { id: 'gingham', nom: 'Cuadros Azul', cat: 'Patrones', pat: PAT.cuadros(AZ, '#e8f0fb'), precio: null, txt: 'Cuadros vichy en azul, fresco y de picnic.' },
-    { id: 'screenshot', nom: 'Screenshot', cat: 'Frases', pat: PAT.liso(N, '#efe7d8'), frase: 'Hay we always have the money to buy the things we screenshot', precio: null, txt: 'Para los que tienen la galería llena de cosas que quieren comprar.' },
-    { id: 'naranja', nom: 'Urbia Orange', cat: 'Básicas', pat: PAT.liso(N, N), marca: 'assets/logo-u-blanco.png', precio: null, txt: 'Naranja Urbia liso con la U. en blanco. Directa y llamativa.' },
-    { id: 'smoke', nom: 'Urbia Smoke', cat: 'Básicas', pat: PAT.liso(N, H), marca: 'assets/logo-u.png', precio: null, txt: 'Humo oscuro con la U. en naranja. Sobria, con el toque de la marca.' },
-    { id: 'ajedrez', nom: 'Check Naranja', cat: 'Patrones', pat: PAT.ajedrez(N, C), precio: null, txt: 'Ajedrez naranja y crema, urbano y gráfico.' }
+    { id: 'orange-stars', nom: 'Orange Stars', img: F + 'orangestarscase.webp', gen: 'Mujer', cat: 'Patrones', precio: null, nuevo: true, txt: 'Estrellas rojas sobre naranja. La más Urbia de todas.' },
+    { id: 'why-not', nom: 'Why Not?', img: F + 'whynotcase.webp', gen: 'Hombre', cat: 'Frases', precio: null, nuevo: true, txt: 'Rojo con letras blancas para los que siempre dicen que sí.' },
+    { id: 'i-love-money', nom: 'I Love $$$', img: F + 'ilovedinero.webp', gen: 'Mujer', cat: 'Frases', precio: null, nuevo: true, txt: 'Lunares, corazón Urbia y signos de pesos. Sin vergüenza de lo que te gusta.' },
+    { id: 'wild-horse', nom: 'Wild Horse', img: F + 'horsecase.webp', gen: 'Hombre', cat: 'Gráficas', precio: null, txt: 'Caballo salvaje con estrellas rojas sobre gris concreto.' },
+    { id: 'swag-zebra', nom: 'Swag Zebra', img: F + 'swagzebracase.webp', gen: 'Mujer', cat: 'Frases', precio: null, txt: 'Cebra en blanco y negro con SWAG en fucsia.' },
+    { id: 'night-drive', nom: 'Night Drive', img: F + 'gtacarcase.webp', gen: 'Hombre', cat: 'Gráficas', precio: null, txt: 'Atardecer morado y un deportivo listo para salir de noche.' },
+    { id: 'corazones', nom: 'Corazones', img: F + 'heartcase.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Corazones rosados sobre rojo, puro amor de bolsillo.' },
+    { id: 'dont-kill-my-vibe', nom: 'Don\'t Kill My Vibe', img: F + 'dontkillmyvibe.webp', gen: 'Hombre', cat: 'Frases', precio: null, txt: 'Azul eléctrico con la frase en grande. Que nadie te baje la energía.' },
+    { id: 'lucky-you', nom: 'Lucky You', img: F + 'lucky-you.webp', gen: 'Mujer', cat: 'Gráficas', precio: null, txt: 'La bola 8 en celeste, para los días de buena suerte.' },
+    { id: 'asap', nom: 'ASAP', img: F + 'asapcase.webp', gen: 'Hombre', cat: 'Gráficas', precio: null, txt: 'Foto en blanco y negro con letras cursivas. Calle pura.' },
+    { id: 'stay-hot', nom: 'Stay Hot and Swag', img: F + 'hotandswag.webp', gen: 'Mujer', cat: 'Frases', precio: null, txt: 'Azul rey con letras rojas. Lo dice todo.' },
+    { id: 'overdrive', nom: 'Overdrive', img: F + 'overdrivecase.webp', gen: 'Hombre', cat: 'Gráficas', precio: null, txt: 'Un clásico de carretera con letras en azul, limpia y con estilo.' },
+    { id: 'wild-stars', nom: 'Wild Stars', img: F + 'redandcheetahstars.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Estrellas rojas y de leopardo sobre azul.' },
+    { id: 'vice-sunset', nom: 'Vice Sunset', img: F + 'gtacase.webp', gen: 'Hombre', cat: 'Gráficas', precio: null, txt: 'Ilustración en tonos fucsia y naranja con vibra de videojuego.' },
+    { id: 'vintage-cat', nom: 'Vintage Cat', img: F + 'vintagecatcase.webp', gen: 'Mujer', cat: 'Gráficas', precio: null, txt: 'Un gatito de postal antigua. Tierna y retro.' },
+    { id: 'rayas-cafe', nom: 'Rayas Café', img: F + 'rayasmale.webp', gen: 'Hombre', cat: 'Patrones', precio: null, txt: 'Rayas verticales café y crema. Sobria, va con todo.' },
+    { id: 'f-ck', nom: 'F★ck', img: F + 'fuck-case.webp', gen: 'Mujer', cat: 'Frases', precio: null, txt: 'Lunares blancos sobre negro con la palabra en rosado. Off script total.' },
+    { id: 'croco-star', nom: 'Croco Star', img: F + 'cocostarcase.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Textura de cocodrilo negra con estrellas rojas.' },
+    { id: 'lilac-stars', nom: 'Lilac Stars', img: F + 'cheetahstars.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Estrellas lila con leopardo sobre vino tinto.' },
+    { id: 'stars-lines', nom: 'Stars & Lines', img: F + 'linesandstarcase.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Rayas azules y café con estrellas crema.' },
+    { id: 'cuadros-candy', nom: 'Cuadros Candy', img: F + 'cuadroscolores.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Cuadros de colores pastel, alegre y fresca.' },
+    { id: 'encaje', nom: 'Encaje', img: F + 'encajecase.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Lunares finos con encaje negro, delicada y coqueta.' },
+    { id: 'rayas-navy-pink', nom: 'Rayas Navy Pink', img: F + 'franjasrosasazules.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Franjas rosadas y azul oscuro, un clásico marinero.' },
+    { id: 'rayas-mint', nom: 'Rayas Mint', img: F + 'franjasverderosa.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Rayas verde menta y rosado, fresca para el día a día.' },
+    { id: 'dots-stripes', nom: 'Dots & Stripes', img: F + 'franjasypuntos.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Lunares rojos arriba y rayas azules abajo, dos estilos en una.' },
+    { id: 'rayas-pastel', nom: 'Rayas Pastel', img: F + 'lineascolores.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Franjas horizontales en pasteles y café.' },
+    { id: 'lunares-cafe', nom: 'Lunares Café', img: F + 'lunaresamarillos.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Lunares crema sobre café chocolate.' },
+    { id: 'lunares-crema', nom: 'Lunares Crema', img: F + 'lunaresmarrones.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Lunares café sobre crema, el clásico al revés.' },
+    { id: 'lunares-navy', nom: 'Lunares Navy', img: F + 'lunarescases.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Lunares blancos sobre azul noche.' },
+    { id: 'rombos', nom: 'Rombos', img: F + 'romboscases.webp', gen: 'Mujer', cat: 'Patrones', precio: null, txt: 'Rombos en blanco y negro, gráfica y atemporal.' }
   ];
+  function porId(id) { return PRODUCTOS.filter(function (q) { return q.id === id; })[0]; }
+  function fotoHTML(p, lazy) { return '<img class="foto-funda" src="' + p.img + '" alt="Funda ' + p.nom + '" width="888" height="1100"' + (lazy ? ' loading="lazy" decoding="async"' : '') + '>'; }
 
-  function fundaHTML(p, extra) {
-    var st = p.img ? 'background-image:url(' + p.img + ');background-size:cover' : '--pat:' + p.pat.pat.replace(/"/g, "'");
-    var h = '<div class="funda" style="' + st + '">' + '<span class="cam"></span>';
-    if (p.frase) h += '<span class="frase" style="--fs:' + (extra && extra.fs || '.62rem') + '">' + p.frase + '</span>';
-    h += '<img class="marca" src="' + (p.marca || 'assets/logo-u.png') + '" alt="">';
-    return h + '</div>';
+  var GENS = ['Todas', 'Mujer', 'Hombre'], CATS = ['Todo', 'Patrones', 'Frases', 'Gráficas'], gen = 'Todas', filtro = 'Todo';
+  function botones(cont, lista, act, alTocar) {
+    lista.forEach(function (c) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = c; b.dataset.v = c; b.setAttribute('aria-pressed', String(c === act));
+      b.addEventListener('click', function () { alTocar(c); });
+      cont.appendChild(b);
+    });
   }
-
-  var CATS = ['Todas', 'Patrones', 'Ilustradas', 'Frases', 'Básicas'], filtro = 'Todas';
-  CATS.forEach(function (c) {
-    var b = document.createElement('button'); b.type = 'button'; b.textContent = c; b.setAttribute('aria-pressed', String(c === filtro));
-    b.addEventListener('click', function () { filtro = c; Array.prototype.forEach.call($('filtros').children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); pintaGrilla(); });
-    $('filtros').appendChild(b);
-  });
+  function marcar(cont, v) { Array.prototype.forEach.call(cont.children, function (x) { x.setAttribute('aria-pressed', String(x.dataset.v === v)); }); }
+  function ponGen(g) { gen = g; marcar($('genero'), g); pintaGrilla(); }
+  botones($('genero'), GENS, gen, ponGen);
+  botones($('filtros'), CATS, filtro, function (c) { filtro = c; marcar($('filtros'), c); pintaGrilla(); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-gen]'), function (a) { a.addEventListener('click', function () { ponGen(a.dataset.gen); }); });
   function pintaGrilla() {
     var g = $('grilla'); g.innerHTML = '';
-    PRODUCTOS.filter(function (p) { return filtro === 'Todas' || p.cat === filtro; }).forEach(function (p) {
-      var b = document.createElement('button'); b.type = 'button'; b.className = 'prod'; b.setAttribute('aria-label', p.nom + ', ' + p.cat + '. Ver detalle');
-      b.innerHTML = '<div class="vitrina">' + (p.nuevo ? '<span class="badge">Nuevo</span>' : '') + fundaHTML(p) + '</div>' +
+    var lista = PRODUCTOS.filter(function (p) { return (gen === 'Todas' || p.gen === gen) && (filtro === 'Todo' || p.cat === filtro); });
+    lista.forEach(function (p) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'prod'; b.setAttribute('aria-label', p.nom + ', ' + p.gen + ', ' + p.cat + '. Ver detalle');
+      b.innerHTML = '<div class="vitrina">' + (p.nuevo ? '<span class="badge">Nuevo</span>' : '') + (gen === 'Todas' ? '<span class="gen">' + p.gen + '</span>' : '') + fotoHTML(p, true) + '</div>' +
         '<div class="info"><div><h3>' + p.nom + '</h3><div class="cat">' + p.cat + '</div><div class="precio">' + plata(p.precio) + '</div></div><span class="mas" aria-hidden="true">+</span></div>';
       b.addEventListener('click', function () { abrirDetalle(p); });
       g.appendChild(b);
     });
+    $('cuenta').textContent = lista.length ? lista.length + (lista.length === 1 ? ' funda' : ' fundas') : 'No hay fundas con ese filtro todavía.';
   }
   pintaGrilla();
 
@@ -502,8 +464,8 @@
 
   function abrirDetalle(p) {
     var modelo = null, cant = 1;
-    abrirHoja('<div class="det"><div class="vista"><div class="brillo" aria-hidden="true"><i style="--s:120%;--x:50%;--y:50%"></i></div>' + fundaHTML(p, { fs: '.8rem' }) + '</div>' +
-      '<div><span class="eti">' + p.cat + '</span><h3 id="hojaTit">' + p.nom + '</h3></div><p>' + p.txt + '</p>' +
+    abrirHoja('<div class="det"><div class="vista"><div class="brillo" aria-hidden="true"><i style="--s:120%;--x:50%;--y:50%"></i></div>' + fotoHTML(p) + '</div>' +
+      '<div><span class="eti">' + p.gen + ' · ' + p.cat + '</span><h3 id="hojaTit">' + p.nom + '</h3></div><p>' + p.txt + '</p>' +
       '<div><span class="ctl">Escoge tu modelo</span><div class="modelos" id="detModelos"></div></div>' +
       '<div class="pie-hoja"><div class="cant"><button type="button" id="menos" aria-label="Quitar una">−</button><span id="cantN">1</span><button type="button" id="mas" aria-label="Agregar una">+</button></div>' +
       '<strong style="color:var(--naranja)">' + plata(p.precio) + '</strong></div>' +
@@ -521,28 +483,28 @@
   /* ================= PEDIDO ================= */
   var pedido = [];
   try { pedido = JSON.parse(localStorage.getItem('urbia-pedido') || '[]') || []; } catch (e) { pedido = []; }
+  pedido = pedido.filter(function (x) { return x && porId(x.id); }); // descarta fundas que ya no están en el catálogo
   function guardar() { try { localStorage.setItem('urbia-pedido', JSON.stringify(pedido)); } catch (e) {} }
   function contar() { var n = pedido.reduce(function (s, x) { return s + x.cant; }, 0); $('nBarra').textContent = n; $('nFlot').textContent = n; $('flotante').hidden = n === 0; return n; }
   function agregar(item) {
     var igual = pedido.filter(function (x) { return x.id === item.id && x.det === item.det; })[0];
-    if (igual && item.id !== 'personalizada') igual.cant += item.cant; else pedido.push(item);
+    if (igual) igual.cant += item.cant; else pedido.push(item);
     guardar(); contar(); avisar('Agregada a tu pedido');
     var b = $('bolsaBtn'); b.classList.remove('salta'); void b.offsetWidth; b.classList.add('salta');
   }
   function textoPedido() {
     var l = ['Hola Urbia, quiero hacer este pedido:', ''];
-    pedido.forEach(function (x, i) { l.push((i + 1) + '. ' + x.nom + ' x' + x.cant + ' (' + x.det + ')'); });
+    pedido.forEach(function (x, i) { l.push((i + 1) + '. ' + x.nom + ' (' + porId(x.id).gen + ') x' + x.cant + ' - ' + x.det); });
     return l.join('\n');
   }
   function abrirPedido() {
     if (!pedido.length) {
-      abrirHoja('<div class="det"><h3 id="hojaTit">Tu pedido</h3><div class="vacio">Todavía no tienes fundas. Escoge una del catálogo o crea la tuya.</div><a class="pill" href="#catalogo" id="irCat">Ver catálogo</a></div>');
+      abrirHoja('<div class="det"><h3 id="hojaTit">Tu pedido</h3><div class="vacio">Todavía no tienes fundas. Escoge una del catálogo.</div><a class="pill" href="#catalogo" id="irCat">Ver catálogo</a></div>');
       $('irCat').addEventListener('click', cerrarHoja); return;
     }
     var h = '<div class="det"><h3 id="hojaTit">Tu pedido</h3><ul class="pedido-lista">';
     pedido.forEach(function (x, i) {
-      var p = PRODUCTOS.filter(function (q) { return q.id === x.id; })[0];
-      var mini = p ? fundaHTML(p) : '<div class="funda" style="--pat:' + (x.pat || '#ff722c').replace(/"/g, "'") + '"><span class="cam"></span></div>';
+      var p = porId(x.id), mini = '<img class="mini" src="' + p.img + '" alt="">';
       h += '<li>' + mini + '<div style="min-width:0"><b>' + x.nom + ' ×' + x.cant + '</b><small>' + x.det + '</small></div><button type="button" class="quitar" data-i="' + i + '" aria-label="Quitar ' + x.nom + '">✕</button></li>';
     });
     h += '</ul><p class="resumen" id="resumen"></p>';
@@ -562,49 +524,6 @@
   }
   $('bolsaBtn').addEventListener('click', abrirPedido); $('flotante').addEventListener('click', abrirPedido);
   contar();
-
-  /* ================= CREA LA TUYA ================= */
-  var FONDOS = { crema: ['Crema', C, N, H], naranja: ['Naranja', N, C, H], humo: ['Humo', H, N, N], azul: ['Azul', '#e8f0fb', AZ, AZ] };
-  var PATRONES = { liso: 'Liso', rayas: 'Rayas', estrellas: 'Estrellas', cuadros: 'Cuadros', puntos: 'Puntos', flores: 'Flores' };
-  var STKS = { ninguno: ['Sin sticker', null], off: ['Off Script', 'assets/off-script.png'], lmy: ['A Little More You', 'assets/little-more-you.png'], est: ['Estrella', 'assets/estrella.png'], parche: ['Parche Urbia', 'assets/parche-urbia.png'], u: ['U.', 'assets/sticker-u.png'] };
-  var cr = { fondo: 'crema', patron: 'estrellas', stk: 'off', nombre: '', modelo: null };
-  function grupo(cont, datos, act, pinta, alTocar) {
-    Object.keys(datos).forEach(function (k) {
-      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(k === act)); pinta(b, k, datos[k]);
-      b.addEventListener('click', function () { Array.prototype.forEach.call(cont.children, function (x) { x.setAttribute('aria-pressed', String(x === b)); }); alTocar(k); pintaCrea(); });
-      cont.appendChild(b);
-    });
-  }
-  grupo($('crColor'), FONDOS, cr.fondo, function (b, k, d) { b.style.setProperty('--c', d[1]); b.setAttribute('aria-label', 'Fondo ' + d[0]); b.title = d[0]; }, function (k) { cr.fondo = k; });
-  grupo($('crPatron'), PATRONES, cr.patron, function (b, k, d) { b.textContent = d; }, function (k) { cr.patron = k; });
-  grupo($('crSticker'), STKS, cr.stk, function (b, k, d) { b.setAttribute('aria-label', d[0]); b.title = d[0]; b.innerHTML = d[1] ? '<img src="' + d[1] + '" alt="">' : 'Ninguno'; }, function (k) { cr.stk = k; sx = 0; sy = 0; });
-  botonesModelo($('crModelo'), null, function (m) { cr.modelo = m; });
-  $('crNombre').addEventListener('input', function () { cr.nombre = this.value.toUpperCase(); pintaCrea(); });
-  var sx = 0, sy = 0;
-  function patronCrea() { var f = FONDOS[cr.fondo]; return PAT[cr.patron](f[2], f[1]); }
-  function pintaCrea() {
-    var f = FONDOS[cr.fondo], p = patronCrea(), el = $('crFunda');
-    el.style.setProperty('--pat', p.pat);
-    var t = $('crTxt'); t.textContent = cr.nombre; t.style.setProperty('--tc', cr.fondo === 'crema' || cr.fondo === 'azul' ? f[2] : '#ffffff'); t.style.setProperty('--ts', cr.fondo === 'humo' ? '#ff722c' : '#232323');
-    t.style.setProperty('--fs', cr.nombre.length > 8 ? '1.2rem' : '1.6rem');
-    var s = $('crStk'), d = STKS[cr.stk]; s.hidden = !d[1]; if (d[1]) { s.src = d[1]; s.style.setProperty('--sx', sx + 'px'); s.style.setProperty('--sy', sy + 'px'); }
-  }
-  pintaCrea();
-  (function () {
-    var s = $('crStk'), ini = null;
-    s.addEventListener('pointerdown', function (e) { e.preventDefault(); ini = { x: e.clientX - sx, y: e.clientY - sy }; s.setPointerCapture(e.pointerId); });
-    s.addEventListener('pointermove', function (e) {
-      if (!ini) return; var r = $('crFunda').getBoundingClientRect();
-      sx = Math.max(-r.width * .4, Math.min(r.width * .4, e.clientX - ini.x)); sy = Math.max(-r.height * .45, Math.min(r.height * .38, e.clientY - ini.y));
-      s.style.setProperty('--sx', sx + 'px'); s.style.setProperty('--sy', sy + 'px');
-    });
-    ['pointerup', 'pointercancel'].forEach(function (ev) { s.addEventListener(ev, function () { ini = null; }); });
-  })();
-  $('crAgregar').addEventListener('click', function () {
-    if (!cr.modelo) { avisar('Escoge el modelo de tu celular'); return; }
-    var d = 'Fondo ' + FONDOS[cr.fondo][0].toLowerCase() + ', ' + PATRONES[cr.patron].toLowerCase() + ', sticker ' + STKS[cr.stk][0] + (cr.nombre ? ', texto "' + cr.nombre + '"' : '') + ' · ' + cr.modelo;
-    agregar({ id: 'personalizada', nom: 'Funda personalizada', det: d, cant: 1, precio: CONFIG.precioPersonalizada, pat: patronCrea().pat });
-  });
 
   /* ================= STICKERS ARRASTRABLES DE LA PORTADA ================= */
   Array.prototype.forEach.call(document.querySelectorAll('#escenario .sticker'), function (el) {
