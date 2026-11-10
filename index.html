@@ -163,14 +163,12 @@
   .historia .fig .estrella-fig { position: absolute; right: -6%; bottom: 8%; width: 34%; }
 
   /* valores */
-  .valores { background: var(--humo); color: var(--blanco); }
   .valores .tit { color: var(--naranja); }
-  .valores .sub { color: var(--crema); }
   .foto-valores { position: relative; border-radius: 26px; overflow: hidden; }
   .foto-valores img { width: 100%; height: auto; }
   .foto-valores .pv { position: absolute; transform: translate(-50%, -50%) rotate(var(--r, 0deg)); }
   .foto-valores .pv[aria-pressed="true"] { background: var(--naranja); color: var(--blanco); border-color: var(--blanco); }
-  .def { margin: 1rem 0 0; min-height: 3em; font-size: 1.05rem; color: var(--crema); }
+  .def { margin: 1rem 0 0; min-height: 3em; font-size: 1.05rem; color: var(--humo); }
   .def b { color: var(--naranja); font-style: italic; }
 
   /* mundo urbia */
@@ -303,9 +301,10 @@
 </section>
 
 <section class="sec valores gutter" id="valores">
-  <div class="ancho">
+  <div class="brillo" aria-hidden="true"><i style="--s:95vw;--x:95%;--y:55%;--t:15s"></i></div>
+  <div class="ancho" style="position:relative;z-index:2">
     <div class="cabeza">
-      <span class="eti" style="color:var(--crema)">Lo que nos mueve</span>
+      <span class="eti">Lo que nos mueve</span>
       <h2 class="tit">Creatividad, innovación <b>y autenticidad.</b></h2>
     </div>
     <div class="foto-valores">
